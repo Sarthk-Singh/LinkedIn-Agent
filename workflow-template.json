@@ -1,0 +1,153 @@
+{
+  "name": "Auto-LinkedIn Poster",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "id": "trigger-node",
+      "name": "Daily 10AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -352,
+        320
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/customsearch/v1",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "key",
+              "value": "<YOUR_GOOGLE_API_KEY>"
+            },
+            {
+              "name": "cx",
+              "value": "<YOUR_GOOGLE_CX_ID>"
+            },
+            {
+              "name": "num",
+              "value": "1"
+            },
+            {
+              "name": "dateRestrict",
+              "value": "m1"
+            },
+            {
+              "name": "q",
+              "value": "AI , tech related trends 2025"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "google-search",
+      "name": "Google Live Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 4.2
+    },
+    {
+      "parameters": {
+        "model": "<Deployment name or model ID>",
+        "options": {}
+      },
+      "id": "openai-model",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "position": [
+        544,
+        592
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Write a LinkedIn post for Sarthak Singh about a recent tech trend, fact, or news update.\n\nLatest trend/news: {{ $('Google Live Search').item.json.items ? $('Google Live Search').item.json.items.slice(0,2).map(r => r.title).join(', ') : 'AI in 2025 – automation, cloud, and innovation' }}\n\nThe post should:\n1. Highlight the fact/news in simple terms.\n2. Add context on why it matters.\n3. Share a short perspective, lesson, or prediction.\n\nTone: professional + insightful, but easy to read. Keep it unique, engaging, and vision-driven.",
+        "options": {
+        "systemMessage": "You are creating LinkedIn content for Sarthak Singh, BTech student and co-founder of IntrinsAi.com — a startup building AI solutions (part of NVIDIA Inception + AWS for Founders).\n\nTone: Professional yet approachable. Posts should mix **tech insights + factual commentary + news updates** with a forward-looking perspective. Keep them crisp, thought-provoking, and engaging.\n\nGoals:\n- Position Sarthak as a young innovator who shares value-packed updates about AI, cloud, automation, and new technologies.\n- Blend industry news with unique insights — not just reposts.\n- Add context: why the news/fact matters for businesses, students, or startups.\n- Make each post original, no repetition of past topics.\n\nCritical:\n- Always tie the news/fact back to a broader theme (innovation, entrepreneurship, AI adoption).\n- Avoid sounding like a journalist; instead, provide personal perspective or prediction.\n- Use clear, engaging storytelling — no jargon dumps."
+      }
+    },
+
+      "id": "linkedin-content-creator",
+      "name": "LinkedIn Content Creator",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        544,
+        304
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "person": "<YOUR_LINKEDIN_PERSON_ID>",
+        "text": "={{ $('LinkedIn Content Creator').item.json.text || $('LinkedIn Content Creator').item.json.output || $('LinkedIn Content Creator').item.json }}",
+        "additionalFields": {
+          "visibility": "PUBLIC"
+        }
+      },
+      "id": "publish-linkedin",
+      "name": "Publish to LinkedIn",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        1008,
+        704
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "<YOUR_GOOGLE_SHEET_URL>",
+        "sheetName": "Sheet1",
+        "columns": {
+          "mappingMode": "autoMapInputData"
+        }
+      },
+      "id": "save-to-sheets",
+      "name": "Save Post to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "position": [
+        1792,
+        720
+      ],
+      "typeVersion": 4.5
+    },
+    {
+      "parameters": {
+        "sendTo": "<YOUR_EMAIL>",
+        "subject": "\u2705 LinkedIn Post Published Successfully",
+        "message": "Your daily LinkedIn post has been published!"
+      },
+      "id": "send-email",
+      "name": "Send Success Email",
+      "type": "n8n-nodes-base.gmail",
+      "position": [
+        1440,
+        1008
+      ],
+      "typeVersion": 2.1
+    }
+  ],
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Kolkata"
+  },
+  "versionId": "template-version",
+  "id": "workflow-template"
+}
