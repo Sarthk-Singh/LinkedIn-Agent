@@ -75,18 +75,6 @@ Tone: professional + insightful, but easy to read. Keep it unique, engaging, and
 
 ---
 
-## 📸 Suggested Docs Screenshots  
-Include the following inside `/docs` for better showcase:  
-- `workflow-overview.png` – n8n full workflow view  
-- `linkedin-node.png` – LinkedIn Content Creator prompt setup  
-- `google-node.png` – Google Search node setup  
-- `workflow-run.png` – Example successful execution  
-- `sample-post.png` – Example generated LinkedIn post  
-- `sheets-log.png` – Example Google Sheets log (optional)  
-- `confirmation-email.png` – Example email notification (optional)  
-
----
-
 ## 🔧 Setup Guide  
 1. Clone the repo  
 2. Import `workflow-template.json` into your **n8n** instance  
